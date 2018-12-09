@@ -10,6 +10,7 @@ const BANDS_URL = "https://rest.bandsintown.com/artists/";
 
 var choice = process.argv[2];
 
+// returns all user command line args beyond the file path
 function grabCommandLineArgs(argsArr) {
   choice = argsArr[3];
   for (let i = 4; i < argsArr.length; i++) {
@@ -18,12 +19,14 @@ function grabCommandLineArgs(argsArr) {
   return choice;
 }
 
+// returns the data from an API call
 async function axiosCall(url) {
   const response = await axios.get(url);
   const data = await response.data;
   return data;
 }
 
+// prints data to the terminal 
 function printData(type, data) {
   switch(type) {
     case "concert":
@@ -39,8 +42,13 @@ function printData(type, data) {
       console.log(`\nSong: ${data.artists[0].name}\nArtist: ${data.name}\nAlbum: ${data.album.name}\n${data.external_urls.spotify}\n`);
       break;
     case "movie":
-      console.log(`\nTitle: ${data.title}\nReleased: ${data.year}\nIMDB Rating: ${data.imdb}\nRotton Tamatoes Rating: ${data.rTom}`);
-      console.log(`Language: ${data.lang}\nPlot: ${data.plot}\nActors: ${data.actors}\n`);
+      if (data === null){
+        console.log('Movie not found!');
+      }
+      else {
+        console.log(`\nTitle: ${data.title}\nReleased: ${data.year}\nIMDB Rating: ${data.imdb}\nRotton Tamatoes Rating: ${data.rTom}`);
+        console.log(`Language: ${data.lang}\nPlot: ${data.plot}\nActors: ${data.actors}\n`);
+      }
       break;
     default:
       console.log('Something went wrong with printData()');
@@ -125,9 +133,7 @@ async function search(userChoice=choice, searchParam=undefined) {
         }
         let data = await axiosCall(`https://www.omdbapi.com/?t=${choice}&apikey=${keys.movies.id}`);
         if (data['Response'] === 'False') {
-          // add this to print function 
-          console.log('Movie not found!');
-          return;
+          printData('movie', null);
         } else {
           printData('movie',
             {
