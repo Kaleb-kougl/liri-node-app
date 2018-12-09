@@ -10,49 +10,86 @@ const BANDS_URL = "https://rest.bandsintown.com/artists/";
 
 var choice = process.argv[2];
 
-function search(userChoice=choice, searchParam=undefined) {
+function grabCommandLineArgs(argsArr) {
+  choice = argsArr[3];
+  for (let i = 4; i < argsArr.length; i++) {
+    choice += ` ${argsArr[i]}`
+  }
+  return choice;
+}
+
+async function axiosCall(url) {
+  const response = await axios.get(url);
+  const data = await response.data;
+  return data;
+}
+
+function printData(type, data) {
+  switch(type) {
+    case "concert":
+      if (data === null) {
+        console.log("Please type a band as well, like the command below.\nnode liri.js concert-this <bandName>");
+      } else if (data === 'none'){
+        console.log('Band not found!')
+      } else {
+        console.log(`${data.venue} - ${data.city}, ${data.country} - ${data.date}\n`);
+      }
+      break;
+    case "song":
+      console.log(`\nSong: ${data.artists[0].name}\nArtist: ${data.name}\nAlbum: ${data.album.name}\n${data.external_urls.spotify}\n`);
+      break;
+    case "movie":
+      console.log(`\nTitle: ${data.title}\nReleased: ${data.year}\nIMDB Rating: ${data.imdb}\nRotton Tamatoes Rating: ${data.rTom}`);
+      console.log(`Language: ${data.lang}\nPlot: ${data.plot}\nActors: ${data.actors}\n`);
+      break;
+    default:
+      console.log('Something went wrong with printData()');
+      break;
+  }
+}
+
+async function search(userChoice=choice, searchParam=undefined) {
   let choice;
   switch (userChoice) {
     case "concert-this":
       if (process.argv.length > 3 || searchParam != undefined) {
         if (searchParam === undefined) {
-          choice = process.argv[3];
-          for (let i = 4; i < process.argv.length; i++) {
-            choice += ` ${process.argv[i]}`
-          }
+          choice = grabCommandLineArgs(process.argv);
         } else {
           choice = searchParam;
         }
-        axios.get(`${BANDS_URL}${choice}/events?app_id=${keys.bands.id}`)
-        .then(function (response) {
-          // if band not in api
-          if (response.data.errorMessage !== undefined) {
-            console.log(response.data.errorMessage);
-          } else {
-            for (let i = 0; i < response.data.length; i++) {
-              let date = moment(response.data[i].datetime, "YYYY-MM-DD").format("MM/DD/YYYY")              
-              console.log(`${response.data[i].venue.name} - ${response.data[i].venue.city}, ${response.data[i].venue.country} - ${date}\n`)
-            }
+        let data = await axiosCall(`${BANDS_URL}${choice}/events?app_id=${keys.bands.id}`);
+        // if band not in api
+        if (data.errorMessage !== undefined) {
+          console.log(response.data.errorMessage);
+        } else {
+          if (data == "{warn=Not found}\n"){
+            printData("concert", 'none');
+            return;
           }
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
+          for (let i = 0; i < data.length; i++) {
+            let date = moment(data[i].datetime, "YYYY-MM-DD").format("MM/DD/YYYY")
+            printData("concert",
+              {
+                'venue': data[i].venue.name,
+                'city': data[i].venue.city,
+                'country': data[i].venue.country,
+                'date': date
+              }
+            );
+          }
+        }
       } else {
-        console.log("Please type a band as well, like the command below.\nnode liri.js concert-this <bandName>");
+        printData("concert", null);
       }
       break;
     case "spotify-this-song":
       if (process.argv.length > 3 || searchParam != undefined) {
         if (searchParam === undefined) {
-          choice = process.argv[3];
-          for (let i = 4; i < process.argv.length; i++) {
-            choice += ` ${process.argv[i]}`
-          }
+          choice = grabCommandLineArgs(process.argv);
         } else {
           choice = searchParam;
         }
-        console.log(`56 ${choice}`);
         Spotify.search({ type: 'track', query: choice }, function(err, data) {
           if (err) {
             return console.log('Error occurred: ' + err);
@@ -60,7 +97,7 @@ function search(userChoice=choice, searchParam=undefined) {
           for (let i = 0; i < data.tracks['items'].length; i++) {
             if (data.tracks['items'][i].name === choice) {
               let printThis = data.tracks['items'][i];
-              console.log(`\nSong: ${printThis.artists[0].name}\nArtist: ${printThis.name}\nAlbum: ${printThis.album.name}\n${printThis.external_urls.spotify}\n`);
+              printData("song", printThis);
             }
           }
         });
@@ -73,7 +110,7 @@ function search(userChoice=choice, searchParam=undefined) {
           for (let i = 0; i < data.tracks['items'].length; i++) {
             if (data.tracks['items'][i].name === 'The Sign') {
               let printThis = data.tracks['items'][i];
-              console.log(`\nSong: ${printThis.artists[0].name}\nArtist: ${printThis.name}\nAlbum: ${printThis.album.name}\n${printThis.external_urls.spotify}\n`);
+              printData("song", printThis);
             }
           }
         });
@@ -81,24 +118,24 @@ function search(userChoice=choice, searchParam=undefined) {
       break;
     case "movie-this":
       if (process.argv.length > 3 || searchParam != undefined) {
-        if (searchParam === undefined) {        
-          choice = process.argv[3];
-          for (let i = 4; i < process.argv.length; i++) {
-            choice += ` ${process.argv[i]}`
-          }
+        if (searchParam === undefined) {
+          choice = grabCommandLineArgs(process.argv);
         } else {
           choice = searchParam
         }
-          
         axios.get(`https://www.omdbapi.com/?t=${choice}&apikey=${keys.movies.id}`)
           .then(function (response) {
-            console.log(`\nTitle: ${response.data['Title']}`);
-            console.log(`Released: ${response.data['Year']}`);
-            console.log(`IMDB Rating: ${response.data['imdbRating']}`);
-            console.log(`Rotton Tamatoes Rating: ${response.data['Ratings'][1]['Value']}`);
-            console.log(`Language: ${response.data['Language']}`);
-            console.log(`Plot: ${response.data['Plot']}`);
-            console.log(`Actors: ${response.data['Actors']}\n`);
+            printData('movie',
+              {
+                'title' : response.data['Title'],
+                'year' : response.data['Year'],
+                'imdb' : response.data['imdbRating'],
+                'rTom' : response.data['Ratings'][1]['Value'],
+                'lang' : response.data['Language'],
+                'plot' : response.data['Plot'],
+                'actors' : response.data['Actors']
+              }
+            );
           })
           .catch(function (error) {
             console.log(error);
@@ -106,13 +143,16 @@ function search(userChoice=choice, searchParam=undefined) {
       } else {
         axios.get(`https://www.omdbapi.com/?t=Mr.+Nobody&apikey=${keys.movies.id}`)
           .then(function (response) {
-            console.log(`\nTitle: ${response.data['Title']}`);
-            console.log(`Released: ${response.data['Year']}`);
-            console.log(`IMDB Rating: ${response.data['imdbRating']}`);
-            console.log(`Rotton Tamatoes Rating: ${response.data['Ratings'][1]['Value']}`);
-            console.log(`Language: ${response.data['Language']}`);
-            console.log(`Plot: ${response.data['Plot']}`);
-            console.log(`Actors: ${response.data['Actors']}\n`);
+            printData('movie',
+            {
+              'title' : response.data['Title'],
+              'year' : response.data['Year'],
+              'imdb' : response.data['imdbRating'],
+              'rTom' : response.data['Ratings'][1]['Value'],
+              'lang' : response.data['Language'],
+              'plot' : response.data['Plot'],
+              'actors' : response.data['Actors']
+            });
           })
           .catch(function (error) {
             console.log(error);
@@ -121,7 +161,6 @@ function search(userChoice=choice, searchParam=undefined) {
       break;
     case "do-what-it-says":
       console.log('do something else');
-      
       fs.readFile("random.txt", "utf8", function(error, data) {
         // If the code experiences any errors it will log the error to the console.
         if (error) {
@@ -143,7 +182,6 @@ function search(userChoice=choice, searchParam=undefined) {
             ('Something wrong with file. Please use proper csv.spotify-this-song,"I Want it That Way"');
         }
       });
-
       break;
     default:
       console.log('please input an option');
