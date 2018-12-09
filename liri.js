@@ -39,7 +39,11 @@ function printData(type, data) {
       }
       break;
     case "song":
-      console.log(`\nSong: ${data.artists[0].name}\nArtist: ${data.name}\nAlbum: ${data.album.name}\n${data.external_urls.spotify}\n`);
+      if (data === null) {
+        console.log(`Couldn't find any matches`);
+      } else {
+        console.log(`\nSong: ${data.artists[0].name}\nArtist: ${data.name}\nAlbum: ${data.album.name}\n${data.external_urls.spotify}\n`);
+      }
       break;
     case "movie":
       if (data === null){
@@ -56,7 +60,8 @@ function printData(type, data) {
   }
 }
 
-async function spotifyCall(choice, defaultVal='The Sign') {
+async function spotifyCall(choice) {
+  let somethingPrinted = false;
   Spotify.search({ type: 'track', query: choice }, function(err, data) {
     if (err) {
       return console.log('Error occurred: ' + err);
@@ -65,7 +70,11 @@ async function spotifyCall(choice, defaultVal='The Sign') {
       if (data.tracks['items'][i].name === choice) {
         let printThis = data.tracks['items'][i];
         printData("song", printThis);
+        somethingPrinted = true;
       }
+    }
+    if (somethingPrinted === false) {
+      printData("song", null);
     }
   });
 }
@@ -74,6 +83,7 @@ async function search(userChoice=choice, searchParam=undefined) {
   let choice;
   switch (userChoice) {
     case "concert-this":
+      let data;
       if (process.argv.length > 3 || searchParam != undefined) {
         if (searchParam === undefined) {
           choice = grabCommandLineArgs(process.argv);
@@ -84,7 +94,7 @@ async function search(userChoice=choice, searchParam=undefined) {
         // if band not in api
         if (data.errorMessage !== undefined) {
           console.log(data.errorMessage);
-          return;
+          break;
         } else {
           if (data == "{warn=Not found}\n"){
             console.log('here');
@@ -101,7 +111,7 @@ async function search(userChoice=choice, searchParam=undefined) {
                 }
               );
             }
-            return;
+            break;
           }
         }
       } else {
@@ -122,7 +132,6 @@ async function search(userChoice=choice, searchParam=undefined) {
       }
       break;
     case "movie-this":
-      let data;
       if (process.argv.length > 3 || searchParam != undefined) {
         if (searchParam === undefined) {
           choice = grabCommandLineArgs(process.argv);
