@@ -26,7 +26,7 @@ async function axiosCall(url) {
   return data;
 }
 
-// prints data to the terminal 
+// prints data to the terminal
 function printData(type, data) {
   switch(type) {
     case "concert":
@@ -84,26 +84,30 @@ async function search(userChoice=choice, searchParam=undefined) {
         // if band not in api
         if (data.errorMessage !== undefined) {
           console.log(data.errorMessage);
+          return;
         } else {
           if (data == "{warn=Not found}\n"){
-            printData("concert", 'none');
+            console.log('here');
+            data = 'none';
+          } else {
+            for (let i = 0; i < data.length; i++) {
+              let date = moment(data[i].datetime, "YYYY-MM-DD").format("MM/DD/YYYY")
+              printData("concert",
+                {
+                  'venue': data[i].venue.name,
+                  'city': data[i].venue.city,
+                  'country': data[i].venue.country,
+                  'date': date
+                }
+              );
+            }
             return;
-          }
-          for (let i = 0; i < data.length; i++) {
-            let date = moment(data[i].datetime, "YYYY-MM-DD").format("MM/DD/YYYY")
-            printData("concert",
-              {
-                'venue': data[i].venue.name,
-                'city': data[i].venue.city,
-                'country': data[i].venue.country,
-                'date': date
-              }
-            );
           }
         }
       } else {
-        printData("concert", null);
+        data = null;
       }
+      printData('concert', data);
       break;
     case "spotify-this-song":
       if (process.argv.length > 3 || searchParam != undefined) {
@@ -125,25 +129,24 @@ async function search(userChoice=choice, searchParam=undefined) {
         } else {
           choice = searchParam
         }
-        data = await axiosCall(`https://www.omdbapi.com/?t=${choice}&apikey=${keys.movies.id}`);
       } else {
-        data = await axiosCall(`https://www.omdbapi.com/?t=Mr.+Nobody&apikey=${keys.movies.id}`);
+        choice = "Mr.+Nobody"
       }
+      data = await axiosCall(`https://www.omdbapi.com/?t=${choice}&apikey=${keys.movies.id}`);
       if (data['Response'] === 'False') {
-        printData('movie', null);
+        data = null;
       } else {
-        printData('movie',
-          {
-            'title' : data['Title'],
-            'year' : data['Year'],
-            'imdb' : data['imdbRating'],
-            'rTom' : data['Ratings'][1]['Value'],
-            'lang' : data['Language'],
-            'plot' : data['Plot'],
-            'actors' : data['Actors']
-          }
-        );
+        data = {
+          'title' : data['Title'],
+          'year' : data['Year'],
+          'imdb' : data['imdbRating'],
+          'rTom' : data['Ratings'][1]['Value'],
+          'lang' : data['Language'],
+          'plot' : data['Plot'],
+          'actors' : data['Actors']
+        }
       }
+      printData('movie', data);
       break;
     case "do-what-it-says":
       console.log('do something else');
