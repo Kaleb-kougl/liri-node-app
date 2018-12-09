@@ -118,45 +118,31 @@ async function search(userChoice=choice, searchParam=undefined) {
       }
       break;
     case "movie-this":
+      let data;
       if (process.argv.length > 3 || searchParam != undefined) {
         if (searchParam === undefined) {
           choice = grabCommandLineArgs(process.argv);
         } else {
           choice = searchParam
         }
-        let data = await axiosCall(`https://www.omdbapi.com/?t=${choice}&apikey=${keys.movies.id}`);
-        if (data['Response'] === 'False') {
-          printData('movie', null);
-        } else {
-          printData('movie',
-            {
-              'title' : data['Title'],
-              'year' : data['Year'],
-              'imdb' : data['imdbRating'],
-              'rTom' : data['Ratings'][1]['Value'],
-              'lang' : data['Language'],
-              'plot' : data['Plot'],
-              'actors' : data['Actors']
-            }
-          );
-        }
+        data = await axiosCall(`https://www.omdbapi.com/?t=${choice}&apikey=${keys.movies.id}`);
       } else {
-        axios.get(`https://www.omdbapi.com/?t=Mr.+Nobody&apikey=${keys.movies.id}`)
-          .then(function (response) {
-            printData('movie',
-            {
-              'title' : response.data['Title'],
-              'year' : response.data['Year'],
-              'imdb' : response.data['imdbRating'],
-              'rTom' : response.data['Ratings'][1]['Value'],
-              'lang' : response.data['Language'],
-              'plot' : response.data['Plot'],
-              'actors' : response.data['Actors']
-            });
-          })
-          .catch(function (error) {
-            console.log(error);
-          });
+        data = await axiosCall(`https://www.omdbapi.com/?t=Mr.+Nobody&apikey=${keys.movies.id}`);
+      }
+      if (data['Response'] === 'False') {
+        printData('movie', null);
+      } else {
+        printData('movie',
+          {
+            'title' : data['Title'],
+            'year' : data['Year'],
+            'imdb' : data['imdbRating'],
+            'rTom' : data['Ratings'][1]['Value'],
+            'lang' : data['Language'],
+            'plot' : data['Plot'],
+            'actors' : data['Actors']
+          }
+        );
       }
       break;
     case "do-what-it-says":
