@@ -81,9 +81,9 @@ async function spotifyCall(choice) {
 
 async function search(userChoice=choice, searchParam=undefined) {
   let choice;
+  let data;
   switch (userChoice) {
     case "concert-this":
-      let data;
       if (process.argv.length > 3 || searchParam != undefined) {
         if (searchParam === undefined) {
           choice = grabCommandLineArgs(process.argv);
