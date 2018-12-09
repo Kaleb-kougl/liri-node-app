@@ -56,6 +56,20 @@ function printData(type, data) {
   }
 }
 
+async function spotifyCall(choice, defaultVal='The Sign') {
+  Spotify.search({ type: 'track', query: choice }, function(err, data) {
+    if (err) {
+      return console.log('Error occurred: ' + err);
+    }
+    for (let i = 0; i < data.tracks['items'].length; i++) {
+      if (data.tracks['items'][i].name === choice) {
+        let printThis = data.tracks['items'][i];
+        printData("song", printThis);
+      }
+    }
+  });
+}
+
 async function search(userChoice=choice, searchParam=undefined) {
   let choice;
   switch (userChoice) {
@@ -69,7 +83,7 @@ async function search(userChoice=choice, searchParam=undefined) {
         let data = await axiosCall(`${BANDS_URL}${choice}/events?app_id=${keys.bands.id}`);
         // if band not in api
         if (data.errorMessage !== undefined) {
-          console.log(response.data.errorMessage);
+          console.log(data.errorMessage);
         } else {
           if (data == "{warn=Not found}\n"){
             printData("concert", 'none');
@@ -98,30 +112,9 @@ async function search(userChoice=choice, searchParam=undefined) {
         } else {
           choice = searchParam;
         }
-        Spotify.search({ type: 'track', query: choice }, function(err, data) {
-          if (err) {
-            return console.log('Error occurred: ' + err);
-          }
-          for (let i = 0; i < data.tracks['items'].length; i++) {
-            if (data.tracks['items'][i].name === choice) {
-              let printThis = data.tracks['items'][i];
-              printData("song", printThis);
-            }
-          }
-        });
+        spotifyCall(choice);
       } else {
-        choice = "The Sign";
-        Spotify.search({ type: 'track', query: choice }, function(err, data) {
-          if (err) {
-            return console.log('Error occurred: ' + err);
-          }
-          for (let i = 0; i < data.tracks['items'].length; i++) {
-            if (data.tracks['items'][i].name === 'The Sign') {
-              let printThis = data.tracks['items'][i];
-              printData("song", printThis);
-            }
-          }
-        });
+        spotifyCall("The Sign");
       }
       break;
     case "movie-this":
