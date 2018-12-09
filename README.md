@@ -4,8 +4,6 @@
 
 - [About](#about)
 - [Features](#features)
-- [Build Process](#build-process)
-- [Live Website](#live-website)
 
 ## About
 
@@ -33,20 +31,31 @@ Liri-node-bot is a command line tool built to give the latest information about 
 
 ## Installation
 
-1) Clone the repository to your computer. 
-2) npm install -> This will get all of the required node packages.
-3) From the terminal go inside the directory of the cloned repo.
-4) Create a .env file inside of the cloned repo. Inside of .env put 
+1. Clone the repository to your computer. 
+1. npm install -> This will get all of the required node packages.
+1. From the terminal go inside the directory of the cloned repo.
+1. Create a .env file inside of the cloned repo. Inside of .env put 
+```
 SPOTIFY_ID=<Your key goes here>
 SPOTIFY_SECRET=<Your key goes here>  
 BANDS_API_KEY=<Your key goes here>
 OMDB_API_KEY=<Your key goes here>
-5) From inside the directory of the cloned repo, run the liri.js with node with the argument of the type of search you would like to perform followed by the string to look up.  
-  node liri.js <look up type> <band/movie/song>
+```
+1. From inside the directory of the cloned repo, run the liri.js with node with the argument of the type of search you would like to perform followed by the string to look up.
+ ```
+ node liri.js <look up type> <band/movie/song>
+ ```
   
-Look up type can be one of the following: spotify-this-song movie-this concert-this
-  E.g. node liri.js spotify-this-song thank u, next
-  
+Look up type can be one of the following: 
+```
+spotify-this-song 
+movie-this 
+concert-this
+```
+  E.g. 
+  ```
+  node liri.js spotify-this-song thank u, next
+  ```
 
 ## Issues Related To Project
 
