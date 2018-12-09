@@ -11,19 +11,19 @@ const BANDS_URL = "https://rest.bandsintown.com/artists/";
 var choice = process.argv[2];
 
 function search(userChoice=choice, searchParam=undefined) {
+  let choice;
   switch (userChoice) {
     case "concert-this":
       if (process.argv.length > 3 || searchParam != undefined) {
-        let band;
         if (searchParam === undefined) {
-          band = process.argv[3];
+          choice = process.argv[3];
           for (let i = 4; i < process.argv.length; i++) {
-            band += ` ${process.argv[i]}`
+            choice += ` ${process.argv[i]}`
           }
         } else {
-          band = searchParam;
+          choice = searchParam;
         }
-        axios.get(`${BANDS_URL}${band}/events?app_id=${keys.bands.id}`)
+        axios.get(`${BANDS_URL}${choice}/events?app_id=${keys.bands.id}`)
         .then(function (response) {
           // if band not in api
           if (response.data.errorMessage !== undefined) {
@@ -44,31 +44,29 @@ function search(userChoice=choice, searchParam=undefined) {
       break;
     case "spotify-this-song":
       if (process.argv.length > 3 || searchParam != undefined) {
-        let song;
         if (searchParam === undefined) {
-          song = process.argv[3];
+          choice = process.argv[3];
           for (let i = 4; i < process.argv.length; i++) {
-            song += ` ${process.argv[i]}`
+            choice += ` ${process.argv[i]}`
           }
         } else {
-          song = searchParam;
+          choice = searchParam;
         }
-        console.log(`56 ${song}`);
-        Spotify.search({ type: 'track', query: song }, function(err, data) {
+        console.log(`56 ${choice}`);
+        Spotify.search({ type: 'track', query: choice }, function(err, data) {
           if (err) {
             return console.log('Error occurred: ' + err);
           }
-          // console.log(data.tracks['items']);
           for (let i = 0; i < data.tracks['items'].length; i++) {
-            if (data.tracks['items'][i].name === song) {
+            if (data.tracks['items'][i].name === choice) {
               let printThis = data.tracks['items'][i];
               console.log(`\nSong: ${printThis.artists[0].name}\nArtist: ${printThis.name}\nAlbum: ${printThis.album.name}\n${printThis.external_urls.spotify}\n`);
             }
           }
         });
       } else {
-        let song = "The Sign";
-        Spotify.search({ type: 'track', query: song }, function(err, data) {
+        choice = "The Sign";
+        Spotify.search({ type: 'track', query: choice }, function(err, data) {
           if (err) {
             return console.log('Error occurred: ' + err);
           }
@@ -83,17 +81,16 @@ function search(userChoice=choice, searchParam=undefined) {
       break;
     case "movie-this":
       if (process.argv.length > 3 || searchParam != undefined) {
-        let movie;
         if (searchParam === undefined) {        
-          movie = process.argv[3];
+          choice = process.argv[3];
           for (let i = 4; i < process.argv.length; i++) {
-            movie += ` ${process.argv[i]}`
+            choice += ` ${process.argv[i]}`
           }
         } else {
-          movie = searchParam
+          choice = searchParam
         }
           
-        axios.get(`https://www.omdbapi.com/?t=${movie}&apikey=${keys.movies.id}`)
+        axios.get(`https://www.omdbapi.com/?t=${choice}&apikey=${keys.movies.id}`)
           .then(function (response) {
             console.log(`\nTitle: ${response.data['Title']}`);
             console.log(`Released: ${response.data['Year']}`);
