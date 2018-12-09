@@ -41,6 +41,10 @@ SPOTIFY_SECRET=<Your key goes here>
 BANDS_API_KEY=<Your key goes here>
 OMDB_API_KEY=<Your key goes here>
 ```
+![Image of keys file]
+<p align="center">
+    <img alt="Image of keys file" title="CCRH" src="liri-node-app/readmeImg/concert-this.png" width="600">
+</p>
 1. From inside the directory of the cloned repo, run the liri.js with node with the argument of the type of search you would like to perform followed by the string to look up.
  ```
  node liri.js <look up type> <band/movie/song>
