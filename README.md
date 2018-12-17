@@ -20,13 +20,13 @@ Liri-node-bot is a command line tool built to give the latest information about 
 
 
 ## Built With
-* [BandsInTown API] (https://www.bandsintown.com/)
-* [Spotify API] (https://developer.spotify.com/documentation/web-api/)
-* [OMDB API] (http://www.omdbapi.com/)
-* [Axios] (https://www.npmjs.com/package/axios)
-* [Moment] (https://www.npmjs.com/package/moment)
-* [node-spotify-api] (https://www.npmjs.com/package/node-spotify-api)
-* [dotenv] (https://www.npmjs.com/package/dotenv)
+* [BandsInTown API](https://www.bandsintown.com/)
+* [Spotify API](https://developer.spotify.com/documentation/web-api/)
+* [OMDB API](http://www.omdbapi.com/)
+* [Axios](https://www.npmjs.com/package/axios)
+* [Moment](https://www.npmjs.com/package/moment)
+* [node-spotify-api](https://www.npmjs.com/package/node-spotify-api)
+* [dotenv](https://www.npmjs.com/package/dotenv)
 * JavaScript/Node
 
 ## Installation
